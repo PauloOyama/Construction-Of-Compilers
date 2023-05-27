@@ -28,7 +28,7 @@ class Point :
     column:int
     
     def __init__(self) -> None:
-        self.init = 0
+        self.init = -1
         self.prox = -1
         self.column = 0
         self.line = 0
@@ -37,10 +37,18 @@ class Point :
     def where(self):
         return (self.line,self.column)
     
+    @property
+    def position(self):
+        return (self.init, self.prox)
+    
     def addInLine(self): self.line +=1
     def addInColumn(self): self.column +=1
-    def initTakeProx(self): self.init = self.prox
     def stepLookAhead(self): self.prox +=1
+    
+    def initTakeProx(self): 
+        self.init = self.prox - 1
+        self.prox = self.init
+
         
 
 class Buffer:
@@ -56,7 +64,7 @@ class Buffer:
     @property
     def lst(self) -> list[list]:
         print(f"Current Buffer ${self.CURRENT_BUFFER + 1}")
-        return self.buffer[self.CURRENT_BUFFER]
+        return 
 
     def change(self) -> None:
         if self.CURRENT_BUFFER == 0:
@@ -75,6 +83,9 @@ class Buffer:
         self.buffer[self.CURRENT_BUFFER] = readed_file
         print("Buffer Loaded")
 
-    def sync(self): self.vigilant.initTakeProx
+    def sync(self)-> str: 
+        token = self.buffer[self.CURRENT_BUFFER][(self.vigilant.init + 1): self.vigilant.prox]
+        self.vigilant.initTakeProx()
+        return token
 
 
