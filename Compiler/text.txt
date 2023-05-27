@@ -1,3 +1,6 @@
+/* Testando qualquer coisa*/
+==
+=
 int main ()
 	{
 		int: x,y,z;

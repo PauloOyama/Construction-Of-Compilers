@@ -6,6 +6,7 @@ BUFFER_SIZE = 511
 RETURN_TOKEN = ()
 buffer = Buffer()
 ASCII_CHARS = string.ascii_uppercase + string.ascii_lowercase
+ASCII_DIGITS = string.digits
 
 #example to run : python lexer.py text.txt
 
@@ -32,30 +33,93 @@ def getToken(buffer: Buffer):
         c = buffer.nextChar
 
         if MACHINE_STATE == 0: 
-            if c in ASCII_CHARS: 
+            if c == '=':
+                MACHINE_STATE = 1
+            elif c == '/':
+                MACHINE_STATE = 4
+            elif c == '<':
+                MACHINE_STATE = 9
+            elif c == '>':
+                MACHINE_STATE = 13
+            elif c in ASCII_CHARS: 
                 MACHINE_STATE = 16
             elif c == " " or c == "\t" or c == "\n":
                 MACHINE_STATE = 18
-            else:
-                pass
+            elif c == '(':
+                MACHINE_STATE = 20
+            elif c == ')':
+                MACHINE_STATE = 21
+            elif c == '+':
+                MACHINE_STATE = 22
+            elif c == '-':
+                MACHINE_STATE = 23
+            elif c == '*':
+                MACHINE_STATE = 24
+            elif c == '^':
+                MACHINE_STATE = 43
+            elif c == '}':
+                MACHINE_STATE = 25
+            elif c == '{':
+                MACHINE_STATE = 26
+            elif c == ';':
+                MACHINE_STATE = 27
+            elif c == 'seila':
+                MACHINE_STATE = 28
+            elif c in ASCII_DIGITS:
+                MACHINE_STATE = 31
+            elif c == ',':
+                MACHINE_STATE = 41
+            elif c == ':':
+                MACHINE_STATE = 42
+
+
+
         elif MACHINE_STATE == 1:
-            pass
+            if c == '=': 
+                MACHINE_STATE = 2
+            else:
+                MACHINE_STATE = 3
+
+
+        elif MACHINE_STATE == 2:
+            return buffer.sync()
+        
+        elif MACHINE_STATE == 3:
+            return buffer.sync()
+
         elif MACHINE_STATE == 4:
-            pass
+            if c != '*':
+                MACHINE_STATE = 5
+            else:
+                MACHINE_STATE = 6
+
+        elif MACHINE_STATE == 5:
+            return buffer.sync()
+
+        elif MACHINE_STATE == 6:
+            if c == '*':
+                MACHINE_STATE = 7
+
+        elif MACHINE_STATE == 7:
+            if c == '/':
+                MACHINE_STATE = 8
+
+        elif MACHINE_STATE == 8:
+            return buffer.sync()
+
         elif MACHINE_STATE == 9:
             pass
+
         elif MACHINE_STATE == 13:
             pass
 
         elif MACHINE_STATE == 16:
             if c not in ASCII_CHARS:
-                token = buffer.sync()
-                return token
+                return buffer.sync()
             
         elif MACHINE_STATE == 18:
             if c != " " and c != "\t" and c != "\n":
-                token = buffer.sync()
-                return token
+                return buffer.sync()
             
         elif MACHINE_STATE == 20:
             pass
