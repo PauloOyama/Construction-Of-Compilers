@@ -1,7 +1,7 @@
 /* Testando qualquer coisa*/
 ==
 =
-int main ()
+function main ()
 	{
 		int: x,y,z;
 		float: h;
@@ -14,7 +14,7 @@ int main ()
 		senao
 		c = 'Alba22';
 	}
-int main ()
+function main ()
 	{
 		int: x,y,z;
 		float: h;
@@ -27,7 +27,7 @@ int main ()
 		senao
 		c = 'Alba22';
 	}
-int main ()
+function main ()
 	{
 		int: x,y,z;
 		float: h;
@@ -40,7 +40,7 @@ int main ()
 		senao
 		c = 'Alba22';
 	}
-int main ()
+function main ()
 	{
 		int: x,y,z;
 		float: h;
@@ -53,7 +53,7 @@ int main ()
 		senao
 		c = 'Alba22';
 	}
-int main ()
+function main ()
 	{
 		int: x,y,z;
 		float: h;
@@ -66,7 +66,7 @@ int main ()
 		senao
 		c = 'Alba22';
 	}
-int main ()
+function main ()
 	{
 		int: x,y,z;
 		float: h;
