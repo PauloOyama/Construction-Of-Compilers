@@ -1,6 +1,7 @@
-import sys
 import string
-from classes import Point, Buffer
+import sys
+
+from classes import Buffer, Point
 
 BUFFER_SIZE = 511
 RETURN_TOKEN = ()
@@ -28,122 +29,183 @@ def buffer_load(file: str) -> str:
 
 # Codificao Direta
 def get_token(buffer: Buffer):
-    MACHINE_STATE = 0
+    machine_state = 0
     while True:
-        c = buffer.nextChar
+        char = buffer.nextChar
 
-        if MACHINE_STATE == 0:
-            if c == "=":
-                MACHINE_STATE = 1
-            elif c == "/":
-                MACHINE_STATE = 4
-            elif c == "<":
-                MACHINE_STATE = 9
-            elif c == ">":
-                MACHINE_STATE = 13
-            elif c in ASCII_CHARS:
-                MACHINE_STATE = 16
-            elif c == " " or c == "\t" or c == "\n":
-                MACHINE_STATE = 18
-            elif c == "(":
-                MACHINE_STATE = 20
-            elif c == ")":
-                MACHINE_STATE = 21
-            elif c == "+":
-                MACHINE_STATE = 22
-            elif c == "-":
-                MACHINE_STATE = 23
-            elif c == "*":
-                MACHINE_STATE = 24
-            elif c == "^":
-                MACHINE_STATE = 43
-            elif c == "}":
-                MACHINE_STATE = 25
-            elif c == "{":
-                MACHINE_STATE = 26
-            elif c == ";":
-                MACHINE_STATE = 27
-            elif c == "seila":
-                MACHINE_STATE = 28
-            elif c in ASCII_DIGITS:
-                MACHINE_STATE = 31
-            elif c == ",":
-                MACHINE_STATE = 41
-            elif c == ":":
-                MACHINE_STATE = 42
-
-        elif MACHINE_STATE == 1:
-            if c == "=":
-                MACHINE_STATE = 2
+        if machine_state == 0:
+            if char == "=":
+                machine_state = 1
+            elif char == "/":
+                machine_state = 4
+            elif char == "<":
+                machine_state = 9
+            elif char == ">":
+                machine_state = 13
+            elif char in ASCII_CHARS:
+                machine_state = 16
+            elif char == " " or char == "\t" or char == "\n":
+                machine_state = 18
+            elif char == "(":
+                machine_state = 20
+            elif char == ")":
+                machine_state = 21
+            elif char == "+":
+                machine_state = 22
+            elif char == "-":
+                machine_state = 23
+            elif char == "*":
+                machine_state = 24
+            elif char == "^":
+                machine_state = 43
+            elif char == "}":
+                machine_state = 25
+            elif char == "{":
+                machine_state = 26
+            elif char == ";":
+                machine_state = 27
+            elif char == "'":
+                machine_state = 28
+            elif char in ASCII_DIGITS:
+                machine_state = 31
+            elif char == ",":
+                machine_state = 41
+            elif char == ":":
+                machine_state = 42
             else:
-                MACHINE_STATE = 3
+                break  # erro
 
-        elif MACHINE_STATE == 2:
-            return buffer.sync()
-
-        elif MACHINE_STATE == 3:
-            return buffer.sync()
-
-        elif MACHINE_STATE == 4:
-            if c != "*":
-                MACHINE_STATE = 5
+        elif machine_state == 1:
+            if char == "=":
+                machine_state = 2
             else:
-                MACHINE_STATE = 6
+                machine_state = 3
 
-        elif MACHINE_STATE == 5:
+        elif machine_state == 2:
             return buffer.sync()
 
-        elif MACHINE_STATE == 6:
-            if c == "*":
-                MACHINE_STATE = 7
-
-        elif MACHINE_STATE == 7:
-            if c == "/":
-                MACHINE_STATE = 8
-
-        elif MACHINE_STATE == 8:
+        elif machine_state == 3:
             return buffer.sync()
 
-        elif MACHINE_STATE == 9:
-            pass
+        elif machine_state == 4:
+            if char != "*":
+                machine_state = 5
+            else:
+                machine_state = 6
 
-        elif MACHINE_STATE == 13:
-            pass
+        elif machine_state == 5:
+            return buffer.sync()
 
-        elif MACHINE_STATE == 16:
-            if c not in ASCII_CHARS:
+        elif machine_state == 6:
+            if char == "*":
+                machine_state = 7
+            # else continue
+
+        elif machine_state == 7:
+            if char == "/":
+                machine_state = 8
+            else:
+                break  # erro
+
+        elif machine_state == 8:
+            return buffer.sync()
+
+        elif machine_state == 9:
+            if char == "=":
+                machine_state = 11
+            elif char == ">":
+                machine_state = 12
+            else:
+                machine_state = 10
+
+        elif machine_state == 10:
+            return buffer.sync()
+
+        elif machine_state == 11:
+            return buffer.sync()
+
+        elif machine_state == 12:
+            return buffer.sync()
+
+        elif machine_state == 13:
+            if char == "=":
+                machine_state = 14
+            else:
+                machine_state = 15
+
+        elif machine_state == 14:
+            return buffer.sync()
+
+        elif machine_state == 15:
+            return buffer.sync()
+
+        elif machine_state == 16:
+            if char not in ASCII_CHARS:
+                machine_state = 17
+            # else continue
+
+        elif machine_state == 17:
+            return buffer.sync()
+
+        elif machine_state == 18:
+            if char not in " \t\n":
                 return buffer.sync()
+            # else continue
 
-        elif MACHINE_STATE == 18:
-            if c != " " and c != "\t" and c != "\n":
+        elif machine_state == 20:
+            return buffer.sync()
+        elif machine_state == 21:
+            return buffer.sync()
+        elif machine_state == 22:
+            return buffer.sync()
+        elif machine_state == 23:
+            return buffer.sync()
+        elif machine_state == 24:
+            return buffer.sync()
+        elif machine_state == 25:
+            return buffer.sync()
+        elif machine_state == 26:
+            return buffer.sync()
+        elif machine_state == 27:
+            return buffer.sync()
+        elif machine_state == 28:
+            if char != "'":
+                machine_state = 29
+            else:
+                break  # erro
+
+        elif machine_state == 29:
+            if char == "'":
                 return buffer.sync()
+            else:
+                break  # erro
 
-        elif MACHINE_STATE == 20:
-            pass
-        elif MACHINE_STATE == 21:
-            pass
-        elif MACHINE_STATE == 22:
-            pass
-        elif MACHINE_STATE == 23:
-            pass
-        elif MACHINE_STATE == 24:
-            pass
-        elif MACHINE_STATE == 25:
-            pass
-        elif MACHINE_STATE == 26:
-            pass
-        elif MACHINE_STATE == 27:
-            pass
-        elif MACHINE_STATE == 28:
-            pass
-        elif MACHINE_STATE == 31:
-            pass
-        elif MACHINE_STATE == 41:
-            pass
-        elif MACHINE_STATE == 42:
-            pass
+        elif machine_state == 30:
+            return buffer.sync()
 
-    # break
+        elif machine_state == 31:
+            if char == ".":
+                machine_state = 33
+            elif char == "E":
+                machine_state == 37
+            elif char not in ASCII_DIGITS:
+                machine_state = 32
+            # else continue
+
+        # TODO: 32, 33, 34, 35, 37, 38, 39, 40
+
+        elif machine_state == 41:
+            return buffer.sync()
+        elif machine_state == 42:
+            return buffer.sync()
+        elif machine_state == 43:
+            # vem do estado 0 após ler "^"
+            # é o "segundo 24"
+            return buffer.sync()
+        else:
+            break  # erro
+
+    print("ERROR")
 
 
 buffer.load = buffer_load(sys.argv[1])
