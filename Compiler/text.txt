@@ -1,3 +1,4 @@
+'A'
 /* Testando qualquer coisa*/
 ==
 =
@@ -12,7 +13,7 @@ function main ()
 		se ( x > y ) entao
 			h = 5.3;
 		senao
-		c = 'Alba22';
+		c = 'A';
 	}
 function main ()
 	{
@@ -25,7 +26,7 @@ function main ()
 		se ( x > y ) entao
 			h = 5.3;
 		senao
-		c = 'Alba22';
+		c = 'L';
 	}
 function main ()
 	{
@@ -38,7 +39,7 @@ function main ()
 		se ( x > y ) entao
 			h = 5.3;
 		senao
-		c = 'Alba22';
+		c = 'B';
 	}
 function main ()
 	{
@@ -51,7 +52,7 @@ function main ()
 		se ( x > y ) entao
 			h = 5.3;
 		senao
-		c = 'Alba22';
+		c = 'A';
 	}
 function main ()
 	{
@@ -64,7 +65,7 @@ function main ()
 		se ( x > y ) entao
 			h = 5.3;
 		senao
-		c = 'Alba22';
+		c = '2';
 	}
 function main ()
 	{
@@ -77,5 +78,5 @@ function main ()
 		se ( x > y ) entao
 			h = 5.3;
 		senao
-		c = 'Alba22';
+		c = '2';
 	}

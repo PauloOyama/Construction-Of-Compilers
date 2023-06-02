@@ -51,6 +51,9 @@ class Point:
     def stepLookAhead(self):
         self.prox += 1
 
+    def handle_look_ahead(self):
+        self.prox -= 1
+
     def initTakeProx(self):
         self.init = self.prox - 1
         self.prox = self.init
@@ -88,7 +91,9 @@ class Buffer:
         self.buffer[self.CURRENT_BUFFER] = readed_file
         print("Buffer Loaded")
 
-    def sync(self) -> str:
+    def sync(self, handle_lookahead: bool = False) -> str:
+        if handle_lookahead:
+            self.vigilant.handle_look_ahead()
         token = self.buffer[self.CURRENT_BUFFER][
             (self.vigilant.init + 1) : self.vigilant.prox
         ]

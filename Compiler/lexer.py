@@ -32,6 +32,7 @@ def get_token(buffer: Buffer):
     machine_state = 0
     while True:
         char = buffer.nextChar
+        # print("MACHINE STATE =", machine_state)
 
         if machine_state == 0:
             if char == "=":
@@ -44,7 +45,7 @@ def get_token(buffer: Buffer):
                 machine_state = 13
             elif char in ASCII_CHARS:
                 machine_state = 16
-            elif char == " " or char == "\t" or char == "\n":
+            elif char in (" ", "\t", "\n"):
                 machine_state = 18
             elif char == "(":
                 machine_state = 20
@@ -85,7 +86,7 @@ def get_token(buffer: Buffer):
             return buffer.sync()
 
         elif machine_state == 3:
-            return buffer.sync()
+            return buffer.sync(handle_lookahead=True)
 
         elif machine_state == 4:
             if char != "*":
@@ -94,7 +95,7 @@ def get_token(buffer: Buffer):
                 machine_state = 6
 
         elif machine_state == 5:
-            return buffer.sync()
+            return buffer.sync(handle_lookahead=True)
 
         elif machine_state == 6:
             if char == "*":
@@ -119,7 +120,7 @@ def get_token(buffer: Buffer):
                 machine_state = 10
 
         elif machine_state == 10:
-            return buffer.sync()
+            return buffer.sync(handle_lookahead=True)
 
         elif machine_state == 11:
             return buffer.sync()
@@ -137,7 +138,7 @@ def get_token(buffer: Buffer):
             return buffer.sync()
 
         elif machine_state == 15:
-            return buffer.sync()
+            return buffer.sync(handle_lookahead=True)
 
         elif machine_state == 16:
             if char not in ASCII_CHARS:
@@ -145,13 +146,15 @@ def get_token(buffer: Buffer):
             # else continue
 
         elif machine_state == 17:
-            return buffer.sync()
+            return buffer.sync(handle_lookahead=True)
 
         elif machine_state == 18:
             if char not in " \t\n":
-                return buffer.sync()
+                machine_state = 19
             # else continue
 
+        elif machine_state == 19:
+            return buffer.sync(handle_lookahead=True)
         elif machine_state == 20:
             return buffer.sync()
         elif machine_state == 21:
@@ -176,7 +179,7 @@ def get_token(buffer: Buffer):
 
         elif machine_state == 29:
             if char == "'":
-                return buffer.sync()
+                machine_state = 30
             else:
                 break  # erro
 
@@ -187,12 +190,55 @@ def get_token(buffer: Buffer):
             if char == ".":
                 machine_state = 33
             elif char == "E":
-                machine_state == 37
+                machine_state = 37
             elif char not in ASCII_DIGITS:
                 machine_state = 32
             # else continue
 
-        # TODO: 32, 33, 34, 35, 37, 38, 39, 40
+        elif machine_state == 32:
+            return buffer.sync(handle_lookahead=True)
+
+        elif machine_state == 33:
+            if char in ASCII_DIGITS:
+                machine_state = 34
+            else:
+                break  # erro
+
+        elif machine_state == 34:
+            if char == "E":
+                machine_state = 37
+            elif char in ASCII_DIGITS:
+                continue
+            elif char != ".":
+                machine_state = 35
+            else:
+                break  # erro
+
+        elif machine_state == 35:
+            return buffer.sync(handle_lookahead=True)
+
+        elif machine_state == 37:
+            if char in "+-":
+                machine_state = 38
+            elif char in ASCII_DIGITS:
+                machine_state = 39
+            else:
+                break  # erro
+
+        elif machine_state == 38:
+            if char in ASCII_DIGITS:
+                machine_state = 39
+            else:
+                break  # erro
+
+        elif machine_state == 39:
+            if char not in (ASCII_DIGITS + "." + "E"):
+                machine_state = 40
+            else:
+                break  # erro
+
+        elif machine_state == 40:
+            return buffer.sync(handle_lookahead=True)
 
         elif machine_state == 41:
             return buffer.sync()
@@ -208,15 +254,17 @@ def get_token(buffer: Buffer):
     print("ERROR")
 
 
-buffer.load = buffer_load(sys.argv[1])
+def main():
+    buffer.load = buffer_load(sys.argv[1])
+
+    i = 0
+    while True:
+        token = get_token(buffer)
+        if token is None:
+            return None
+        print(i, repr(token))
+        i += 1
 
 
-print(get_token(buffer))
-print(get_token(buffer))
-print(get_token(buffer))
-print(get_token(buffer))
-print(get_token(buffer))
-print(get_token(buffer))
-# print(buffer.nextChar)
-# print(buffer.nextChar)
-# print(buffer.vigilant.where)
+if __name__ == "__main__":
+    main()
