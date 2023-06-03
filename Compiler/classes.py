@@ -31,7 +31,7 @@ class Point:
     def __init__(self) -> None:
         self.init = -1
         self.prox = -1
-        self.column = 0
+        self.column = -1
         self.line = 0
 
     @property
@@ -44,6 +44,7 @@ class Point:
 
     def addInLine(self):
         self.line += 1
+        self.column = 0
 
     def addInColumn(self):
         self.column += 1
@@ -83,8 +84,11 @@ class Buffer:
 
     @lst.getter
     def nextChar(self):
-        self.vigilant.stepLookAhead()
-        return self.buffer[self.CURRENT_BUFFER][self.vigilant.prox]
+        try:
+            self.vigilant.stepLookAhead()
+            return self.buffer[self.CURRENT_BUFFER][self.vigilant.prox]
+        except:
+            print("Change")
 
     @lst.setter
     def load(self, readed_file: str) -> None:
@@ -99,3 +103,9 @@ class Buffer:
         ]
         self.vigilant.initTakeProx()
         return token
+    
+    def isEndOfFile(self) -> bool:
+        if self.buffer[self.CURRENT_BUFFER][self.vigilant.prox] == '$' and self.vigilant.prox != 512:
+            return True
+        elif self.buffer[self.CURRENT_BUFFER][self.vigilant.prox] == '$' and self.vigilant.prox == 512:
+            return False
