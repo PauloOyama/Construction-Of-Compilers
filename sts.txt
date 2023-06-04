@@ -1,15 +1,41 @@
 function main ()
 	{
+		int: x;
+		x = 10;
+		
+		/*
 		int: x,y,z;
 		float: h;
 		char: c;
-
-		/*
-			Testando qualquer coisa
-		*/
+		int: numero;
 
 		se ( x > y ) entao 
 			h = 5.3;
 		senao
 			c = 'A';
+		
+		enquanto (x <= 50) faca {
+			x = x + 1;
+
+		}
+
+		repita {
+			y = y + 2;
+		} ate (y == 50)
+
+		
+		numero = 60;
+
+		se (numero <> 10) entao {
+			char: haru;
+			haru = 'H';
+			x = 120;
+		} senao {
+			x = 60;
+		}
+
+		se (alba == 8) entao {
+			
+		}
+		*/
 	}

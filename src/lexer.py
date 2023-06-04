@@ -1,6 +1,6 @@
 import string
 from src import token as tk
-from src.classes import Buffer, symbol_table
+from src.classes import Buffer, symbol_table, buffer
 
 
 ASCII_CHARS = string.ascii_uppercase + string.ascii_lowercase
@@ -9,6 +9,11 @@ ASCII_DIGITS = string.digits
 
 class LexerError(Exception):
     """Errors on Lexer"""
+
+    position: tuple[int, int]
+
+    def __init__(self, position: tuple[int, int]) -> None:
+        self.position = position
 
 
 # example to run : python lexer.py text.txt
@@ -74,7 +79,7 @@ def set_exp(exp: str) -> tk.Token:
 
 
 # Codificao Direta
-def get_token(buffer: Buffer) -> tk.Token | None:
+def get_token(buffer: Buffer) -> tuple[tk.Token, tuple[int, int]] | None:
     """
     Função principal no lexer. Retorna o próximo token lido no arquivo.
     Caso seja final do arquivo, retorna None.
@@ -136,11 +141,13 @@ def get_token(buffer: Buffer) -> tk.Token | None:
                     machine_state = 3
 
             case 2:
+                location = buffer.scan_point.location
                 buffer.sync()
-                return relop_token(tk.RELOP_EQ)
+                return relop_token(tk.RELOP_EQ), location
 
             case 3:
-                return common_symbol(buffer.sync(handle_lookahead=True))
+                location = buffer.scan_point.location
+                return common_symbol(buffer.sync(handle_lookahead=True)), location
 
             case 4:
                 if char != "*":
@@ -149,7 +156,8 @@ def get_token(buffer: Buffer) -> tk.Token | None:
                     machine_state = 6
 
             case 5:
-                return common_symbol(buffer.sync(handle_lookahead=True))
+                location = buffer.scan_point.location
+                return common_symbol(buffer.sync(handle_lookahead=True)), location
 
             case 6:
                 if char == "*":
@@ -175,16 +183,19 @@ def get_token(buffer: Buffer) -> tk.Token | None:
                     machine_state = 10
 
             case 10:
+                location = buffer.scan_point.location
                 buffer.sync(handle_lookahead=True)
-                return relop_token(tk.RELOP_LT)
+                return relop_token(tk.RELOP_LT), location
 
             case 11:
+                location = buffer.scan_point.location
                 buffer.sync()
-                return relop_token(tk.RELOP_LE)
+                return relop_token(tk.RELOP_LE), location
 
             case 12:
+                location = buffer.scan_point.location
                 buffer.sync()
-                return relop_token(tk.RELOP_NE)
+                return relop_token(tk.RELOP_NE), location
 
             case 13:
                 if char == "=":
@@ -193,12 +204,14 @@ def get_token(buffer: Buffer) -> tk.Token | None:
                     machine_state = 15
 
             case 14:
+                location = buffer.scan_point.location
                 buffer.sync()
-                return relop_token(tk.RELOP_GE)
+                return relop_token(tk.RELOP_GE), location
 
             case 15:
+                location = buffer.scan_point.location
                 buffer.sync(handle_lookahead=True)
-                return relop_token(tk.RELOP_GT)
+                return relop_token(tk.RELOP_GT), location
 
             case 16:
                 if char not in ASCII_CHARS:
@@ -206,7 +219,8 @@ def get_token(buffer: Buffer) -> tk.Token | None:
                 # else continue
 
             case 17:
-                return set_id(buffer.sync(handle_lookahead=True))
+                location = buffer.scan_point.location
+                return set_id(buffer.sync(handle_lookahead=True)), location
 
             case 18:
                 if char not in " \t\n":
@@ -217,21 +231,29 @@ def get_token(buffer: Buffer) -> tk.Token | None:
                 buffer.sync(handle_lookahead=True)
                 machine_state = 0  # reinicia a funcao pra ignorar comentários
             case 20:
-                return common_symbol(buffer.sync())
+                location = buffer.scan_point.location
+                return common_symbol(buffer.sync()), location
             case 21:
-                return common_symbol(buffer.sync())
+                location = buffer.scan_point.location
+                return common_symbol(buffer.sync()), location
             case 22:
-                return common_symbol(buffer.sync())
+                location = buffer.scan_point.location
+                return common_symbol(buffer.sync()), location
             case 23:
-                return common_symbol(buffer.sync())
+                location = buffer.scan_point.location
+                return common_symbol(buffer.sync()), location
             case 24:
-                return common_symbol(buffer.sync())
+                location = buffer.scan_point.location
+                return common_symbol(buffer.sync()), location
             case 25:
-                return common_symbol(buffer.sync())
+                location = buffer.scan_point.location
+                return common_symbol(buffer.sync()), location
             case 26:
-                return common_symbol(buffer.sync())
+                location = buffer.scan_point.location
+                return common_symbol(buffer.sync()), location
             case 27:
-                return common_symbol(buffer.sync())
+                location = buffer.scan_point.location
+                return common_symbol(buffer.sync()), location
 
             case 28:
                 if char != "'":
@@ -246,7 +268,8 @@ def get_token(buffer: Buffer) -> tk.Token | None:
                     break  # erro
 
             case 30:
-                return set_char(buffer.sync())
+                location = buffer.scan_point.location
+                return set_char(buffer.sync()), location
 
             case 31:
                 if char == ".":
@@ -258,7 +281,8 @@ def get_token(buffer: Buffer) -> tk.Token | None:
                 # else continue
 
             case 32:
-                return set_int(buffer.sync(handle_lookahead=True))
+                location = buffer.scan_point.location
+                return set_int(buffer.sync(handle_lookahead=True)), location
 
             case 33:
                 if char in ASCII_DIGITS:
@@ -277,7 +301,8 @@ def get_token(buffer: Buffer) -> tk.Token | None:
                     break  # erro
 
             case 35:
-                return set_frac(buffer.sync(handle_lookahead=True))
+                location = buffer.scan_point.location
+                return set_frac(buffer.sync(handle_lookahead=True)), location
 
             case 37:
                 if char in "+-":
@@ -300,20 +325,24 @@ def get_token(buffer: Buffer) -> tk.Token | None:
                     break  # erro
 
             case 40:
-                return set_exp(buffer.sync(handle_lookahead=True))
+                location = buffer.scan_point.location
+                return set_exp(buffer.sync(handle_lookahead=True)), location
             case 41:
-                return common_symbol(buffer.sync())
+                location = buffer.scan_point.location
+                return common_symbol(buffer.sync()), location
             case 42:
-                return common_symbol(buffer.sync())
+                location = buffer.scan_point.location
+                return common_symbol(buffer.sync()), location
 
             case 99:
                 # vem do estado 0 após ler "^"
                 # é o "segundo 24"
-                return common_symbol(buffer.sync())
+                location = buffer.scan_point.location
+                return common_symbol(buffer.sync()), location
 
             case _:
                 break  # erro
 
     if machine_state == 0 and char == "$":
         return None
-    raise LexerError
+    raise LexerError(buffer.scan_point.location)

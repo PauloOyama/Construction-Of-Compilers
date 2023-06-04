@@ -80,23 +80,23 @@ class Point:
     def __init__(self) -> None:
         self.init = -1
         self.prox = -1
-        self.column = -1
-        self.line = 0
+        self.column = 1
+        self.line = 1
 
     @property
-    def where(self):
+    def location(self):
         return (self.line, self.column)
+
+    def update_location(self, lexem: str):
+        lex_lines = lexem.split("\n")
+        self.line += max(len(lex_lines) - 1, 0)
+        if len(lex_lines) > 1:
+            self.column = 1
+        self.column += len(lex_lines[-1])
 
     @property
     def position(self):
         return (self.init, self.prox)
-
-    def add_in_line(self):
-        self.line += 1
-        self.column = 0
-
-    def add_in_column(self):
-        self.column += 1
 
     def step_look_ahead(self):
         self.prox += 1
@@ -110,38 +110,42 @@ class Point:
 
 
 class Buffer:
-    buffer_pair: list[list]
+    buffer_pair: list[str]
     current_buffer: int
-    vigilant: Point
+    scan_point: Point
     buffer_num: int
+    _has_swaped: bool
+    file = str
 
     def __init__(self, file="") -> None:
         self.buffer_pair = [[], []]
         self.current_buffer = 0
         self.buffer_num = 0
-        self.vigilant = Point()
+        self.scan_point = Point()
+        self.file = file
         self.load(file=file)
+        self._has_swaped = False
 
     def change(self) -> None:
-        if self.current_buffer == 0:
-            self.current_buffer = 1
-        else:
-            self.current_buffer = 0
+        self.scan_point.prox = -1
+        self._has_swaped = True
+        self.current_buffer = (self.current_buffer + 1) % 2
         debug_print("Att Buffer")
 
     @property
     def next_char(self) -> str | None:
         """Retorna o próximo caracter no buffer, lidando com a troca de buffers (sentinelas)"""
 
-        self.vigilant.step_look_ahead()
-        next_char = self.buffer_pair[self.current_buffer][self.vigilant.prox]
+        self.scan_point.step_look_ahead()
+        next_char = self.buffer_pair[self.current_buffer][self.scan_point.prox]
 
         if next_char == "$":
             #  Pode ser sentinela padrão ou pode ser final de arquivo
-            if self.vigilant.prox == BUFFER_SIZE - 1:
+            if self.scan_point.prox == BUFFER_SIZE - 1:
                 # Sentinela padrão (final de buffer)
                 debug_print("Change")
-                raise NotImplementedError
+                self.change()
+                self.load(file=self.file)
             # else: FIM DE ARQUIVO
         return next_char
 
@@ -149,6 +153,7 @@ class Buffer:
         with open(file, "r", encoding="utf-8") as file_code:
             # move pointer for where to read
             file_code.seek(self.buffer_num * BUFFER_SIZE)
+            self.buffer_num += 1
 
             buffer_ = file_code.read(BUFFER_SIZE - 1)
             buffer_ = buffer_ + "$"
@@ -161,22 +166,29 @@ class Buffer:
 
     def sync(self, handle_lookahead: bool = False) -> str:
         """
-        Retorna o lexema definido pelos ponteiros 'init' e 'prox', lidando com lookahead
-        se necessário, e preparando os ponteiros para continuar a análise léxica.
+        Retorna o lexema definido pelos ponteiros 'init' e 'prox' e o seu "Point" de início,
+        lidando com lookahead se necessário, e preparando os ponteiros para continuar a análise léxica.
         """
         if handle_lookahead:
-            self.vigilant.handle_look_ahead()
-        token = self.buffer_pair[self.current_buffer][
-            (self.vigilant.init + 1) : self.vigilant.prox
-        ]
-        self.vigilant.init_take_prox()
-        return token
+            self.scan_point.handle_look_ahead()
 
-    def is_end_of_file(self) -> bool:
-        return (
-            self.buffer_pair[self.current_buffer][self.vigilant.prox] == "$"
-            and self.vigilant.prox != 512
-        )
+        lexem = ""
+
+        if self._has_swaped:
+            old_buffer = (self.current_buffer + 1) % 2
+            first_part = self.buffer_pair[old_buffer][
+                (self.scan_point.init + 1) : (BUFFER_SIZE)
+            ]
+            last_part = self.buffer_pair[self.current_buffer][0 : self.scan_point.prox]
+            lexem = first_part + last_part
+            self._has_swaped = False
+        else:
+            lexem = self.buffer_pair[self.current_buffer][
+                (self.scan_point.init + 1) : self.scan_point.prox
+            ]
+        self.scan_point.init_take_prox()
+        self.scan_point.update_location(lexem)
+        return lexem
 
 
 def debug_print(value: str):
@@ -193,9 +205,11 @@ class UnexpectedTokenException(Exception):
     """
 
     token: Token
+    position: tuple[int, int]
 
-    def __init__(self, token: Token):
-        self.token = token
+    def __init__(self, lexer_result: tuple[Token, tuple[int, int]] | None):
+        self.token = lexer_result[0]
+        self.position = lexer_result[1]
 
 
 buffer = Buffer(file=sys.argv[1])

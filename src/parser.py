@@ -30,10 +30,13 @@ def parser():
     node = tree.create_node(tag=initial_symbol.value)
     initial_symbol.uuid = node.identifier
 
-    next_token = get_token(buffer)
+    lexer_result = get_token(buffer)
 
     try:
         while stack.is_not_empty():
+            if lexer_result is not None:
+                next_token, _ = lexer_result
+
             # Take element at the top of the stack
             stack_symbol = stack.peek()
 
@@ -58,9 +61,9 @@ def parser():
                     debug_print("Match symbol with next token")
                     popped = stack.pop()
                     debug_print(f"Popped: {popped.value}")
-                    next_token = get_token(buffer)
+                    lexer_result = get_token(buffer)
                 else:
-                    raise UnexpectedTokenException(next_token)
+                    raise UnexpectedTokenException(lexer_result)
 
             else:
                 debug_print("Not terminal, searching for valid production")
@@ -80,7 +83,7 @@ def parser():
                 )
 
                 if symbols is None:
-                    raise UnexpectedTokenException(next_token)
+                    raise UnexpectedTokenException(lexer_result)
 
                 popped = stack.pop()
                 debug_print(f"Popped: {popped.value}")
@@ -100,8 +103,8 @@ def parser():
                     child_symbol.uuid = node.identifier
                     stack.push(child_symbol)
 
-        if next_token is not None:
-            raise UnexpectedTokenException(next_token)
+        if lexer_result is not None:
+            raise UnexpectedTokenException(lexer_result)
 
         print("Recognized Input sequence")
         tree.show()
@@ -112,7 +115,9 @@ def parser():
             entry = symbol_table.table[exception.token.token_attribute].lexemn
         else:
             entry = exception.token.token_type
-        print(f"Syntax Error: unexpected token from entry ({entry})")
+        print(
+            f"Syntax Error: unexpected token from entry ({entry}) at {exception.position[0]}, {exception.position[1]}"
+        )
         debug_print("Stack on this moment")
         while stack.is_not_empty():
             debug_print(stack.pop().value)
