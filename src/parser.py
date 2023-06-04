@@ -1,9 +1,11 @@
 from treelib import Tree
 
 from src.classes import SymbolTable, UnexpectedTokenException
-from src.parser_table import ParseTableSymbol, table
+from src.parser_table import ParseTableSymbol, parser_table
 from src.stack import Stack
 from src.token import Token
+
+LESS_THEN = -1
 
 tokens: list[Token | None] = [
     Token("ID", 0),  # function
@@ -23,18 +25,31 @@ tokens: list[Token | None] = [
     Token("=", None),
     Token("ID", 13),  # y
     Token(";", None),
+    Token("ID", 4),  # se
+    Token("(", None),
+    Token("ID", 12),  # x
+    Token("op_rel", LESS_THEN),  # <
+    Token("ID", 13),  # y
+    Token(")", None),
+    Token("entao", 5),
+    Token("{", None),
+    Token("ID", 12),  # x
+    Token("=", None),
+    Token("ID", 14),  # z
+    Token(";", None),
+    Token("}", None),
     Token("}", None),
     None,
 ]
 
-DEBUG = True
+DEBUG = False
 COUNT = 0
 
 symbol_table = SymbolTable()
-print(symbol_table.append("main", "ID", None, None))
-print(symbol_table.append("x", "ID", None, None))
-print(symbol_table.append("y", "ID", None, None))
-print(symbol_table.append("z", "ID", None, None))
+symbol_table.append("main", "ID", None, None)
+symbol_table.append("x", "ID", None, None)
+symbol_table.append("y", "ID", None, None)
+symbol_table.append("z", "ID", None, None)
 
 
 def lexer() -> Token | None:
@@ -77,19 +92,18 @@ def parser():
             )
 
             if stack_symbol.is_terminal:
-                match_token = False
+                match_token = stack_symbol.value == next_token.token_type
+                # Check needed because keywords are treated as identifiers
                 if next_token.token_type == "ID":
                     lexemn = symbol_table.table[next_token.token_attribute].lexemn
                     debug_print(f"Token Type ID: {lexemn}")
 
+                    # In case that token from lexer is a keyword(function, int, etc)
+                    # The match with the symbol on top of stack need to be done with
+                    # the lexemn(function, int, etc) and not with the token_type(ID)
                     if lexemn in symbol_table.keywords:
                         match_token = stack_symbol.value == lexemn
-                    else:
-                        match_token = stack_symbol.value == next_token.token_type
-                elif stack_symbol.value == next_token.token_type:
-                    match_token = True
 
-                # if stack_symbol.value == next_token.token_type:
                 if match_token:
                     debug_print("Match symbol with next token")
                     popped = stack.pop()
@@ -101,12 +115,19 @@ def parser():
             else:
                 debug_print("Not terminal, searching for valid production")
                 key_to_search = next_token.token_type
+                # Check needed because keywords are treated as identifiers
                 if next_token.token_type == "ID":
                     lexemn = symbol_table.table[next_token.token_attribute].lexemn
                     debug_print(f"Token Type ID: {lexemn}")
-                    key_to_search = lexemn
+                    # In case that token from lexer is a keyword(function, int, etc)
+                    # we need to search in the parser_table for the keyword
+                    # In case token is an ID, we search for "ID"
+                    if lexemn in symbol_table.keywords:
+                        key_to_search = lexemn
 
-                symbols = table.get(stack_symbol.value, {}).get(key_to_search, None)
+                symbols = parser_table.get(stack_symbol.value, {}).get(
+                    key_to_search, None
+                )
 
                 if symbols is None:
                     raise UnexpectedTokenException(next_token.token_type)
@@ -143,13 +164,9 @@ def parser():
         return None
 
 
-# Estrutura de dados:
-# Deverá representar tanto terminais quanto não-terminais
-
-
 def debug_print(value: str):
     """
-    A function to print if debug parameter is true
+    A function to print something if debug parameter is true
     """
     if DEBUG:
         print(value)

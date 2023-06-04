@@ -92,6 +92,7 @@ PROD21 = [
     ParseTableSymbol("(", True),
     ParseTableSymbol("COND", False),
     ParseTableSymbol(")", True),
+    ParseTableSymbol("entao", True),
     ParseTableSymbol("CMD_OU_BLOCO", False),
     ParseTableSymbol("CMD_SELECAO'", False),
 ]
@@ -144,7 +145,7 @@ PROD39 = [ParseTableSymbol("CONST_CHAR", True)]
 PROD40 = [ParseTableSymbol("CONST_NUM", True)]
 PROD41 = [ParseTableSymbol("ID", True)]
 
-table = {
+parser_table = {
     "INICIO": {
         "function": PROD1,
     },
