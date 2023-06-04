@@ -4,10 +4,12 @@ function main ()
 		float: h;
 		char: c;
 
-		/* Testando qualquer coisa*/
+		/*
+			Testando qualquer coisa
+		*/
 
-		se ( x > y ) entao
+		se ( x > y ) entao 
 			h = 5.3;
 		senao
-		c = 'A';
-	}'A*
+			c = 'A';
+	}

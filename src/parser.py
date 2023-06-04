@@ -1,63 +1,13 @@
+"""
+    Source code of Parser
+"""
+
 from treelib import Tree
 
-from src.classes import SymbolTable, UnexpectedTokenException
+from src.lexer import get_token
 from src.parser_table import ParseTableSymbol, parser_table
 from src.stack import Stack
-from src.token import Token
-
-LESS_THEN = -1
-
-tokens: list[Token | None] = [
-    Token("ID", 0),  # function
-    Token("ID", 11),  # main
-    Token("(", None),
-    Token(")", None),
-    Token("{", None),
-    Token("ID", 1),  # int
-    Token(":", None),
-    Token("ID", 12),  # x
-    Token(",", None),
-    Token("ID", 13),  # y
-    Token(",", None),
-    Token("ID", 14),  # z
-    Token(";", None),
-    Token("ID", 12),  # x
-    Token("=", None),
-    Token("ID", 13),  # y
-    Token(";", None),
-    Token("ID", 4),  # se
-    Token("(", None),
-    Token("ID", 12),  # x
-    Token("op_rel", LESS_THEN),  # <
-    Token("ID", 13),  # y
-    Token(")", None),
-    Token("entao", 5),
-    Token("{", None),
-    Token("ID", 12),  # x
-    Token("=", None),
-    Token("ID", 14),  # z
-    Token(";", None),
-    Token("}", None),
-    Token("}", None),
-    None,
-]
-
-DEBUG = False
-COUNT = 0
-
-symbol_table = SymbolTable()
-symbol_table.append("main", "ID", None, None)
-symbol_table.append("x", "ID", None, None)
-symbol_table.append("y", "ID", None, None)
-symbol_table.append("z", "ID", None, None)
-
-
-def lexer() -> Token | None:
-    """Mocked lexer"""
-    global COUNT
-    token = tokens[COUNT]
-    COUNT += 1
-    return token
+from src.classes import debug_print, UnexpectedTokenException, symbol_table, buffer
 
 
 def parser():
@@ -80,7 +30,7 @@ def parser():
     node = tree.create_node(tag=initial_symbol.value)
     initial_symbol.uuid = node.identifier
 
-    next_token = lexer()
+    next_token = get_token(buffer)
 
     try:
         while stack.is_not_empty():
@@ -108,9 +58,9 @@ def parser():
                     debug_print("Match symbol with next token")
                     popped = stack.pop()
                     debug_print(f"Popped: {popped.value}")
-                    next_token = lexer()
+                    next_token = get_token(buffer)
                 else:
-                    raise UnexpectedTokenException(next_token.token_type)
+                    raise UnexpectedTokenException(next_token)
 
             else:
                 debug_print("Not terminal, searching for valid production")
@@ -130,7 +80,7 @@ def parser():
                 )
 
                 if symbols is None:
-                    raise UnexpectedTokenException(next_token.token_type)
+                    raise UnexpectedTokenException(next_token)
 
                 popped = stack.pop()
                 debug_print(f"Popped: {popped.value}")
@@ -151,31 +101,19 @@ def parser():
                     stack.push(child_symbol)
 
         if next_token is not None:
-            raise UnexpectedTokenException(next_token.token_type)
+            raise UnexpectedTokenException(next_token)
 
         print("Recognized Input sequence")
         tree.show()
         return tree
     except UnexpectedTokenException as exception:
-        print(f"Syntax Error: unexpected token from entry ({exception})")
+        entry = ""
+        if exception.token.token_type in ("ID", "CONST_CHAR", "CONST_NUM"):
+            entry = symbol_table.table[exception.token.token_attribute].lexemn
+        else:
+            entry = exception.token.token_type
+        print(f"Syntax Error: unexpected token from entry ({entry})")
         debug_print("Stack on this moment")
         while stack.is_not_empty():
             debug_print(stack.pop().value)
         return None
-
-
-def debug_print(value: str):
-    """
-    A function to print something if debug parameter is true
-    """
-    if DEBUG:
-        print(value)
-
-
-if __name__ == "__main__":
-    parser()
-
-
-# IDEIA: Criar um arquivo que conterá as variáveis globais(count de linha, coluna, etc.)
-# Dessa forma, é possível colocar o analisador sintático e léxico em arquivos diferentes
-# e ter uma organização melhor

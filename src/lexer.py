@@ -1,11 +1,14 @@
 import string
-import sys
-
 from src import token as tk
-from src.classes import Buffer, Point
+from src.classes import Buffer, symbol_table
+
 
 ASCII_CHARS = string.ascii_uppercase + string.ascii_lowercase
 ASCII_DIGITS = string.digits
+
+
+class LexerError(Exception):
+    """Errors on Lexer"""
 
 
 # example to run : python lexer.py text.txt
@@ -22,28 +25,52 @@ def common_symbol(symbol: str) -> tk.Token:
 
 
 def set_id(identifier: str) -> tk.Token:
-    # TODO: lógica da tabela de símbolos
-    return tk.Token("ID", -1)
+    position = symbol_table.lookup(identifier)
+    if position is None:
+        position = symbol_table.append(identifier, "ID", None, None)
+    return tk.Token("ID", position)
 
 
 def set_char(character: str) -> tk.Token:
-    # TODO: lógica da tabela de símbolos
-    return tk.Token("CONST_CHAR", -1)
+    position = symbol_table.lookup(character)
+    if position is None:
+        position = symbol_table.append(
+            lexemn=character, token_type="CONST_CHAR", value=character, data_type="char"
+        )
+    return tk.Token("CONST_CHAR", position)
 
 
 def set_int(integer: str) -> tk.Token:
-    # TODO: lógica da tabela de símbolos
-    return tk.Token("CONST_NUM", -1)
+    position = symbol_table.lookup(integer)
+    if position is None:
+        position = symbol_table.append(
+            lexemn=integer, token_type="CONST_NUM", value=integer, data_type="int"
+        )
+    return tk.Token("CONST_NUM", position)
 
 
 def set_frac(fractional_nbr: str) -> tk.Token:
-    # TODO: lógica da tabela de símbolos
-    return tk.Token("CONST_NUM", -1)
+    position = symbol_table.lookup(fractional_nbr)
+    if position is None:
+        position = symbol_table.append(
+            lexemn=fractional_nbr,
+            token_type="CONST_NUM",
+            value=fractional_nbr,
+            data_type="float",
+        )
+    return tk.Token("CONST_NUM", position)
 
 
 def set_exp(exp: str) -> tk.Token:
-    # TODO: lógica da tabela de símbolos
-    return tk.Token("CONST_NUM", -1)
+    position = symbol_table.lookup(exp)
+    if position is None:
+        position = symbol_table.append(
+            lexemn=exp,
+            token_type="CONST_NUM",
+            value=exp,
+            data_type="float",
+        )
+    return tk.Token("CONST_NUM", position)
 
 
 # Codificao Direta
@@ -289,21 +316,4 @@ def get_token(buffer: Buffer) -> tk.Token | None:
 
     if machine_state == 0 and char == "$":
         return None
-    raise Exception("Lexer Error")
-
-
-def main():
-    buffer_ = Buffer(file=sys.argv[1])
-
-    i = 0
-    while True:
-        token = get_token(buffer_)
-        if token is None:
-            print("EOF")
-            return None
-        print(i, repr(token))
-        i += 1
-
-
-if __name__ == "__main__":
-    main()
+    raise LexerError

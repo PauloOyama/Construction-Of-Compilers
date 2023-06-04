@@ -1,4 +1,8 @@
+import sys
+from src.token import Token
+
 BUFFER_SIZE = 512
+DEBUG = False
 
 
 class SymbolTableEntry:
@@ -60,6 +64,12 @@ class SymbolTable:
         self.table.append(symbol_entry)
         return len(self.table) - 1
 
+    def lookup(self, lexemn: str) -> int | None:
+        for i, entry in enumerate(self.table):
+            if entry.lexemn == lexemn:
+                return i
+        return None
+
 
 class Point:
     init: int
@@ -117,18 +127,20 @@ class Buffer:
             self.current_buffer = 1
         else:
             self.current_buffer = 0
-        print("Att Buffer")
+        debug_print("Att Buffer")
 
     @property
     def next_char(self) -> str | None:
         """Retorna o próximo caracter no buffer, lidando com a troca de buffers (sentinelas)"""
+
         self.vigilant.step_look_ahead()
         next_char = self.buffer_pair[self.current_buffer][self.vigilant.prox]
+
         if next_char == "$":
             #  Pode ser sentinela padrão ou pode ser final de arquivo
             if self.vigilant.prox == BUFFER_SIZE - 1:
                 # Sentinela padrão (final de buffer)
-                print("Change")
+                debug_print("Change")
                 raise NotImplementedError
             # else: FIM DE ARQUIVO
         return next_char
@@ -142,12 +154,16 @@ class Buffer:
             buffer_ = buffer_ + "$"
             # Nao apagar linha abaixo talvez seja bom para testes
             # buffer = repr(buffer)
-            print(len(buffer_))
+            debug_print(len(buffer_))
             self.buffer_pair[self.current_buffer] = buffer_
 
-        print("Buffer Loaded")
+        debug_print("Buffer Loaded")
 
     def sync(self, handle_lookahead: bool = False) -> str:
+        """
+        Retorna o lexema definido pelos ponteiros 'init' e 'prox', lidando com lookahead
+        se necessário, e preparando os ponteiros para continuar a análise léxica.
+        """
         if handle_lookahead:
             self.vigilant.handle_look_ahead()
         token = self.buffer_pair[self.current_buffer][
@@ -157,16 +173,18 @@ class Buffer:
         return token
 
     def is_end_of_file(self) -> bool:
-        if (
+        return (
             self.buffer_pair[self.current_buffer][self.vigilant.prox] == "$"
             and self.vigilant.prox != 512
-        ):
-            return True
-        elif (
-            self.buffer_pair[self.current_buffer][self.vigilant.prox] == "$"
-            and self.vigilant.prox == 512
-        ):
-            return False
+        )
+
+
+def debug_print(value: str):
+    """
+    A function to print something if debug parameter is true
+    """
+    if DEBUG:
+        print(value)
 
 
 class UnexpectedTokenException(Exception):
@@ -174,7 +192,11 @@ class UnexpectedTokenException(Exception):
     Exception for cases of unexpected token from entry
     """
 
-    lexemn: str
+    token: Token
 
-    def __init__(self, lexemn: str):
-        self.lexemn = lexemn
+    def __init__(self, token: Token):
+        self.token = token
+
+
+buffer = Buffer(file=sys.argv[1])
+symbol_table = SymbolTable()

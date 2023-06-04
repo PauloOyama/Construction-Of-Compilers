@@ -169,8 +169,8 @@ parser_table = {
     },
     "TIPO": {
         "int": PROD6,
-        "char": PROD7,
-        "float": PROD8,
+        "float": PROD7,
+        "char": PROD8,
     },
     "LISTA_IDS": {
         "ID": PROD9,
