@@ -1,153 +1,29 @@
-function main ()
-	{
-		int: x,y,z;
-		float: h;
-		char: c;
+function main () {
+	int: x,y,z;
+	float: h;
+	char: c;
+	int: numero;
 
-		/* Testando qualquer coisa*/
-
-		se ( x > y ) entao
-			h = 5.3;
-		senao
+	se ( x > y ) entao 
+		h = 5.3;
+	senao
 		c = 'A';
-
-		int: x,y,z;
-		float: h;
-		char: c;
-
-		/* Testando qualquer coisa*/
-
-		se ( x > y ) entao
-			h = 5.3;
-		senao
-		c = 'L';
-	}
-function main ()
-	{
-		int: x,y,z;
-		float: h;
-		char: c;
-
-		/* Testando qualquer coisa*/
-
-		se ( x > y ) entao
-			h = 5.3;
-		senao
-		c = 'B';
-	}
-function main ()
-	{
-		int: x,y,z;
-		float: h;
-		char: c;
-
-		/* Testando qualquer coisa*/
-
-		se ( x > y ) entao
-			h = 5.3;
-		senao
-		c = 'A';
-	}
-function main ()
-	{
-		int: x,y,z;
-		float: h;
-		char: c;
-
-		/* Testando qualquer coisa*/
-
-		se ( x > y ) entao
-			h = 5.3;
-		senao
-		c = '2';
-	}
-function main ()
-	{
-		int: x,y,z;
-		float: h;
-		char: c;
-
-		/* Testando qualquer coisa*/
-
-		se ( x > y ) entao
-			h = 5.3;
-		senao
-		c = '2';
+	
+	enquanto (x <= 50) faca {
+		x = x + 1;
 	}
 
-function main ()
-	{
-		int: x,y,z;
-		float: h;
-		char: c;
+	repita {
+		y = y + 2;
+	} ate (y == 50)
 
-		/* Testando qualquer coisa*/
+	numero = 60;
 
-		se ( x > y ) entao
-			h = 5.3;
-		senao
-		c = 'A';
-
-		int: x,y,z;
-		float: h;
-		char: c;
-
-		/* Testando qualquer coisa*/
-
-		se ( x > y ) entao
-			h = 5.3;
-		senao
-		c = 'L';
+	se (numero <> 10) entao {
+		char: haru;
+		haru = 'H';
+		x = 120;
+	} senao {
+		x = 60;
 	}
-function main ()
-	{
-		int: x,y,z;
-		float: h;
-		char: c;
-
-		/* Testando qualquer coisa*/
-
-		se ( x > y ) entao
-			h = 5.3;
-		senao
-		c = 'B';
-	}
-function main ()
-	{
-		int: x,y,z;
-		float: h;
-		char: c;
-
-		/* Testando qualquer coisa*/
-
-		se ( x > y ) entao
-			h = 5.3;
-		senao
-		c = 'A';
-	}
-function main ()
-	{
-		int: x,y,z;
-		float: h;
-		char: c;
-
-		/* Testando qualquer coisa*/
-
-		se ( x > y ) entao
-			h = 5.3;
-		senao
-		c = '2';
-	}
-function main ()
-	{
-		int: x,y,z;
-		float: h;
-		char: c;
-
-		/* Testando qualquer coisa*/
-
-		se ( x > y ) entao
-			h = 5.3;
-		senao
-		c = '2';
-	}
+}
