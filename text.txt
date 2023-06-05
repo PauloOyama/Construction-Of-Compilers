@@ -1,7 +1,40 @@
-'A'
-/* Testando qualquer coisa*/
-==
-=
+function main ()
+	{
+		int: x,y,z;
+		float: h;
+		char: c;
+
+		/* Testando qualquer coisa*/
+
+		se ( x > y ) entao
+			h = 5.3;
+		senao
+		c = 'A';
+
+		int: x,y,z;
+		float: h;
+		char: c;
+
+		/* Testando qualquer coisa*/
+
+		se ( x > y ) entao
+			h = 5.3;
+		senao
+		c = 'L';
+	}
+function main ()
+	{
+		int: x,y,z;
+		float: h;
+		char: c;
+
+		/* Testando qualquer coisa*/
+
+		se ( x > y ) entao
+			h = 5.3;
+		senao
+		c = 'B';
+	}
 function main ()
 	{
 		int: x,y,z;
@@ -17,6 +50,44 @@ function main ()
 	}
 function main ()
 	{
+		int: x,y,z;
+		float: h;
+		char: c;
+
+		/* Testando qualquer coisa*/
+
+		se ( x > y ) entao
+			h = 5.3;
+		senao
+		c = '2';
+	}
+function main ()
+	{
+		int: x,y,z;
+		float: h;
+		char: c;
+
+		/* Testando qualquer coisa*/
+
+		se ( x > y ) entao
+			h = 5.3;
+		senao
+		c = '2';
+	}
+
+function main ()
+	{
+		int: x,y,z;
+		float: h;
+		char: c;
+
+		/* Testando qualquer coisa*/
+
+		se ( x > y ) entao
+			h = 5.3;
+		senao
+		c = 'A';
+
 		int: x,y,z;
 		float: h;
 		char: c;

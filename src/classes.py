@@ -1,7 +1,8 @@
 import sys
+
 from src.token import Token
 
-BUFFER_SIZE = 512
+BUFFER_SIZE = 8192
 DEBUG = False
 
 
@@ -22,6 +23,9 @@ class SymbolTableEntry:
         self.token_type = token_type
         self.token_attribute = token_attribute
         self.data_type = data_type
+
+    def __repr__(self) -> str:
+        return f"SymbolTableEntry({self.lexemn}, {self.token_type}, {self.token_attribute}, {self.data_type})"
 
 
 class SymbolTable:

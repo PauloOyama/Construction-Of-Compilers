@@ -6,6 +6,7 @@ class ParseTableSymbol:
     uuid: str
     value: str
     is_terminal: bool
+    prod: list[any]
 
     def __init__(self, value, is_terminal):
         self.value = value

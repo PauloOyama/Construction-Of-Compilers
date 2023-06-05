@@ -1,7 +1,7 @@
 import string
-from src import token as tk
-from src.classes import Buffer, symbol_table, buffer
 
+from src import token as tk
+from src.classes import Buffer, buffer, symbol_table
 
 ASCII_CHARS = string.ascii_uppercase + string.ascii_lowercase
 ASCII_DIGITS = string.digits
@@ -344,5 +344,16 @@ def get_token(buffer: Buffer) -> tuple[tk.Token, tuple[int, int]] | None:
                 break  # erro
 
     if machine_state == 0 and char == "$":
+        # Final de Arquivo
         return None
     raise LexerError(buffer.scan_point.location)
+
+
+if __name__ == "__main__":
+    i = 0
+    while True:
+        token = get_token(buffer)
+        if token is None:
+            break
+        print(i, repr(token))
+        i += 1
