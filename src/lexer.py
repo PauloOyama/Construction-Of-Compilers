@@ -1,7 +1,7 @@
 import string
 
 from src import token as tk
-from src.classes import Buffer, buffer, symbol_table
+from src.classes import Buffer, buffer, debug_print, symbol_table
 
 ASCII_CHARS = string.ascii_uppercase + string.ascii_lowercase
 ASCII_DIGITS = string.digits
@@ -17,8 +17,6 @@ class LexerError(Exception):
 
 
 # example to run : python lexer.py text.txt
-
-# TODO: rever as ações do autômato na especificação
 
 
 def relop_token(op_code: int) -> tk.Token:
@@ -355,5 +353,5 @@ if __name__ == "__main__":
         token = get_token(buffer)
         if token is None:
             break
-        print(i, repr(token))
+        debug_print(i, repr(token))
         i += 1

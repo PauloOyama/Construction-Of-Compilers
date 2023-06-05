@@ -5,7 +5,7 @@
 from treelib import Tree
 
 from src.classes import UnexpectedTokenException, buffer, debug_print, symbol_table
-from src.lexer import get_token
+from src.lexer import LexerError, get_token
 from src.parser_table import ParseTableSymbol, parser_table
 from src.stack import Stack
 
@@ -74,7 +74,7 @@ def parser():
 
             elif stack_symbol.is_terminal is None:
                 popped = stack.pop()
-                print(f"Popped Special Symbol: {popped.value}")
+                debug_print(f"Popped Special Symbol: {popped.value}")
                 ## Execute semantic analysis on special symbol
                 on_semantic_pop(tree, popped)
 
@@ -136,7 +136,7 @@ def parser():
         if lexer_result is not None:
             raise UnexpectedTokenException(lexer_result)
 
-        print("Recognized Input sequence")
+        debug_print("Recognized Input sequence")
         tree.show()
         return tree
     except UnexpectedTokenException as exception:
@@ -146,28 +146,37 @@ def parser():
         else:
             entry = exception.token.token_type
         print(
-            f"Syntax Error: unexpected token from entry ({entry}) at {exception.position[0]}, {exception.position[1]}"
+            f"Syntax Error: unexpected token from entry ({entry}) at {exception.position[0]}, {exception.position[1]}."
         )
         debug_print("Stack on this moment")
         while stack.is_not_empty():
             debug_print(stack.pop().value)
         return None
+    except SyntaxTypeError:
+        print(
+            "Type Error: an incompatibility was found between expression operator types."
+        )
+        return None
+    except LexerError as exception:
+        print(
+            f"Name Error: coundn't match token at {exception.position[0]}, {exception.position[1]}."
+        )
 
 
 def on_semantic_pop(tree: Tree, special_symbol: ParseTableSymbol):
-    print(f"Popping {special_symbol.value} | {special_symbol.uuid}")
+    debug_print(f"Popping {special_symbol.value} | {special_symbol.uuid}")
     # tree.show()
     # print("---------")
     parent = tree.parent(special_symbol.uuid)
     # print(f"Parent ID: {parent_id}")
     sub_tree = tree.subtree(parent.identifier)
     # print(sub_tree.depth())
-    sub_tree.show()
-    print("Production: ")
+    # sub_tree.show()
+    debug_print("Production: ")
     for prod_symbols in special_symbol.prod:
-        print(f"{prod_symbols.value}", end=" ")
-    print("")
-    print("============")
+        debug_print(f"{prod_symbols.value}", end=" ")
+    debug_print("")
+    debug_print("============")
 
     children = list(reversed(sub_tree.children(parent.identifier)))
 
@@ -199,7 +208,7 @@ def on_semantic_pop(tree: Tree, special_symbol: ParseTableSymbol):
             parent.data = [prod_id.data["token_attribute"]] + prod_lista_ids.data
 
     elif parent.tag == "CMD_ATRIB":
-        validate_expr_type(
+        validate_attr_type(
             get_sym_table_entry(children[0].data["token_attribute"]).data_type,
             children[2].data,
         )
@@ -230,7 +239,7 @@ def on_semantic_pop(tree: Tree, special_symbol: ParseTableSymbol):
             # / EXPONENC TERMO'
             parent.data = validate_expr_type(children[1].data, children[2].data)
     elif parent.tag == "EXPONENC":
-        # FATOR EXPONENC''
+        # FATOR EXPONENC'
         parent.data = validate_expr_type(children[0].data, children[1].data)
     elif parent.tag == "EXPONENC'":
         if len(special_symbol.prod) == 0:
@@ -251,9 +260,8 @@ def on_semantic_pop(tree: Tree, special_symbol: ParseTableSymbol):
                 children[0].data["token_attribute"]
             ).data_type
 
-    print(sub_tree.to_json(with_data=True))
-
-    print("============")
+    debug_print(sub_tree.to_json(with_data=True))
+    debug_print("============")
 
 
 def update_sym_table_entries(data_type: str, idxs: list[int]):
@@ -283,6 +291,7 @@ def validate_expr_type(type1: str, type2: str):
         return type2
     if type2 == "int" and type1 == "float":
         return type1
+    return type1
 
 
 def validate_attr_type(id_type: str, expression_type: str):
@@ -296,3 +305,6 @@ def validate_attr_type(id_type: str, expression_type: str):
         raise SyntaxTypeError()
     if id_type == "float" and expression_type == "int":
         return id_type
+    if id_type == "int" and expression_type == "float":
+        raise SyntaxTypeError()
+    return id_type

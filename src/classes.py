@@ -195,12 +195,12 @@ class Buffer:
         return lexem
 
 
-def debug_print(value: str):
+def debug_print(*args, **kwargs):
     """
     A function to print something if debug parameter is true
     """
     if DEBUG:
-        print(value)
+        print(*args, **kwargs)
 
 
 class UnexpectedTokenException(Exception):
