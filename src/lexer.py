@@ -212,7 +212,7 @@ def get_token(buffer: Buffer) -> tuple[tk.Token, tuple[int, int]] | None:
                 return relop_token(tk.RELOP_GT), location
 
             case 16:
-                if char not in ASCII_CHARS:
+                if char not in (ASCII_CHARS + ASCII_DIGITS):
                     machine_state = 17
                 # else continue
 

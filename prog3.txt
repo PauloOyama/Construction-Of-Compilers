@@ -1,0 +1,20 @@
+function prog3 ()
+{
+    /* Programa com erro sintatico */
+    int : x, y;
+
+    x = 0;
+    y = 0;
+
+    enquanto (x <> 10) faca
+    {
+
+        x = x + 1;
+	/* este comentario nao estah errado */
+        se (x > 10) entao
+        {
+            y=1;
+        }
+
+    }
+}
